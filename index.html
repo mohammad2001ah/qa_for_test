@@ -1,558 +1,1721 @@
 <!DOCTYPE html>
 <!-- BUG-027: Page title says "Untitled Document" -->
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Untitled Document</title><!-- BUG-027 -->
-    <meta name="description" content="ShopBuggy — Your one-stop beauty & lifestyle store.">
-    <style>
-        /* ===== RESET & BASE ===== */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; background: #f5f5f5; line-height: 1.6; }
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; }
-        img { max-width: 100%; display: block; }
-        button, input, select, textarea { font-family: inherit; font-size: inherit; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untitled Document</title><!-- BUG-027 -->
+  <meta name="description" content="ShopBuggy — Your one-stop beauty & lifestyle store.">
+  <style>
+    /* ===== RESET & BASE ===== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* ===== HEADER ===== */
-        .site-header { position: sticky; top: 0; z-index: 1000; background: #1a1a2e; color: #fff; padding: 12px 30px; display: flex; align-items: center; justify-content: space-between; }
-        .logo { font-size: 1.6rem; font-weight: 700; letter-spacing: 1px; }
-        .logo span { color: #e94560; }
-        .header-search { flex: 1; max-width: 420px; margin: 0 30px; position: relative; }
-        .header-search input { width: 100%; padding: 9px 40px 9px 14px; border: none; border-radius: 20px; font-size: .95rem; outline: none; }
-        .header-search button { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: #e94560; border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem; }
-        .header-actions { display: flex; align-items: center; gap: 18px; }
-        .header-actions a { color: #fff; font-size: .9rem; cursor: pointer; }
-        .cart-icon { position: relative; font-size: 1.3rem; cursor: pointer; }
-        .cart-count { position: absolute; top: -8px; right: -10px; background: #e94560; color: #fff; font-size: .7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      background: #f5f5f5;
+      line-height: 1.6;
+    }
 
-        /* ===== NAV ===== */
-        .main-nav { background: #16213e; padding: 0 30px; }
-        .main-nav ul { display: flex; gap: 0; }
-        .main-nav li a { display: block; padding: 12px 20px; color: #ccc; font-size: .9rem; transition: background .2s, color .2s; }
-        .main-nav li a:hover, .main-nav li a.active { background: #e94560; color: #fff; }
-        /* BUG-023: hamburger visible on desktop because of min-width instead of max-width */
-        .hamburger { display: none; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 10px; }
-        @media (min-width: 768px) { /* BUG-023: should be max-width */
-            .hamburger { display: block; }
-        }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
 
-        /* ===== HERO ===== */
-        .hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; text-align: center; padding: 70px 30px; }
-        .hero h1 { font-size: 2.6rem; margin-bottom: 12px; }
-        .hero p { font-size: 1.15rem; color: #ccc; margin-bottom: 25px; }
-        .hero-btn { display: inline-block; padding: 12px 36px; background: #e94560; color: #fff; border: none; border-radius: 25px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .3s; }
-        .hero-btn:hover { background: #c73651; }
+    ul {
+      list-style: none;
+    }
 
-        /* ===== PRODUCT GRID ===== */
-        .section-title { text-align: center; font-size: 1.6rem; margin: 40px 0 10px; color: #1a1a2e; }
-        .section-subtitle { text-align: center; color: #888; margin-bottom: 25px; font-size: .95rem; }
-        .sort-bar { display: flex; justify-content: flex-end; padding: 0 40px; margin-bottom: 10px; }
-        .sort-bar select { padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: .9rem; }
-        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; padding: 0 40px 40px; max-width: 1200px; margin: 0 auto; }
-        .product-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08); transition: transform .25s, box-shadow .25s; position: relative; }
-        .product-card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0,0,0,.13); }
-        .product-img { width: 100%; height: 220px; object-fit: cover; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: .85rem; }
-        .product-img img { width: 100%; height: 100%; object-fit: cover; }
-        .product-info { padding: 14px 16px 18px; }
-        .product-name { font-size: .95rem; font-weight: 600; margin-bottom: 6px; color: #1a1a2e; }
-        /* BUG-024: overflow hidden with no ellipsis for product 7 */
-        .product-card:nth-child(7) .product-name { white-space: nowrap; overflow: hidden; max-width: 100px; /* BUG-024: truncated mid-word, no ellipsis */ }
-        .product-price { font-size: 1.05rem; font-weight: 700; color: #e94560; }
-        .product-price .old-price { text-decoration: line-through; color: #999; font-weight: 400; font-size: .9rem; margin-left: 6px; }
-        .product-card .btn-add-cart { display: block; width: 100%; padding: 10px; background: #1a1a2e; color: #fff; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; transition: background .2s; }
-        .product-card .btn-add-cart:hover { background: #e94560; }
-        .sale-badge { position: absolute; top: 12px; left: 12px; background: #e94560; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: .75rem; font-weight: 700; }
-        /* BUG-025: sale badge on product 6 off-screen */
-        .product-card:nth-child(6) .sale-badge { left: 350px; /* BUG-025: positioned off-screen */ }
-        .review-link { display: inline-block; margin-top: 6px; font-size: .8rem; color: #e94560; }
-        .show-more-wrap { text-align: center; padding: 20px 0 40px; }
-        .btn-show-more { padding: 10px 30px; background: #1a1a2e; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-size: .9rem; }
-        .hidden-products { display: none; }
+    img {
+      max-width: 100%;
+      display: block;
+    }
 
-        /* ===== SPECIAL OFFERS ===== */
-        .offers-section { background: #fff3f3; padding: 40px; }
-        .offers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; max-width: 1000px; margin: 0 auto; }
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+      font-size: inherit;
+    }
 
-        /* ===== NEWSLETTER ===== */
-        .newsletter { background: #1a1a2e; color: #fff; text-align: center; padding: 50px 30px; }
-        .newsletter h2 { margin-bottom: 10px; font-size: 1.4rem; }
-        .newsletter p { color: #aaa; margin-bottom: 20px; }
-        .newsletter-form { display: flex; justify-content: center; gap: 10px; }
-        .newsletter-form input { padding: 10px 18px; border: none; border-radius: 20px; width: 300px; font-size: .95rem; }
-        .newsletter-form button { padding: 10px 24px; background: #e94560; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; }
+    /* ===== HEADER ===== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 12px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-        /* ===== MODAL ===== */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-overlay.open { display: flex; }
-        .modal { background: #fff; border-radius: 12px; padding: 35px 30px; width: 400px; max-width: 92%; position: relative; }
-        .modal h2 { margin-bottom: 20px; color: #1a1a2e; }
-        .modal .close-btn { position: absolute; top: 12px; right: 16px; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: #666; }
-        .modal label { display: block; margin-bottom: 4px; font-size: .85rem; font-weight: 600; color: #555; }
-        .modal input { width: 100%; padding: 9px 12px; margin-bottom: 14px; border: 1px solid #ddd; border-radius: 6px; }
-        .modal .btn-submit { width: 100%; padding: 10px; background: #e94560; color: #fff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .modal .btn-submit:hover { background: #c73651; }
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
 
-        /* ===== REGISTRATION ===== */
-        .register-section { max-width: 560px; margin: 40px auto; background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
-        .register-section h2 { margin-bottom: 20px; color: #1a1a2e; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 4px; font-size: .85rem; font-weight: 600; color: #555; }
-        .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; }
-        .required-star { color: #e94560; }
-        .register-section .btn-submit { padding: 12px 30px; background: #e94560; color: #fff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    .logo span {
+      color: #e94560;
+    }
 
-        /* ===== CART ===== */
-        .cart-section { max-width: 800px; margin: 40px auto; background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
-        .cart-section h2 { margin-bottom: 20px; color: #1a1a2e; }
-        .cart-table { width: 100%; border-collapse: collapse; }
-        .cart-table th, .cart-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        .cart-table th { background: #f9f9f9; font-size: .85rem; color: #666; text-transform: uppercase; }
-        .cart-table .remove-btn { background: #e94560; color: #fff; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: .8rem; }
-        .cart-summary { text-align: right; margin-top: 20px; }
-        .cart-summary .total { font-size: 1.3rem; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; }
-        .promo-row { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px; }
-        .promo-row input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; width: 180px; }
-        .promo-row button { padding: 8px 16px; background: #1a1a2e; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
-        .promo-msg { text-align: right; color: green; font-size: .85rem; margin-bottom: 10px; display: none; }
-        .btn-checkout { padding: 12px 36px; background: #e94560; color: #fff; border: none; border-radius: 25px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    .header-search {
+      flex: 1;
+      max-width: 420px;
+      margin: 0 30px;
+      position: relative;
+    }
 
-        /* ===== FOOTER ===== */
-        .site-footer { background: #1a1a2e; color: #ccc; padding: 40px 30px 20px; }
-        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1100px; margin: 0 auto 30px; }
-        .footer-col h3 { color: #fff; margin-bottom: 12px; font-size: 1rem; }
-        .footer-col a { display: block; color: #aaa; font-size: .85rem; margin-bottom: 6px; transition: color .2s; }
-        .footer-col a:hover { color: #e94560; }
-        .social-icons { display: flex; gap: 12px; margin-top: 8px; }
-        .social-icons a { width: 34px; height: 34px; background: #16213e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: .9rem; transition: background .2s; }
-        .social-icons a:hover { background: #e94560; }
-        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid #2a2a4a; font-size: .8rem; color: #666; }
+    .header-search input {
+      width: 100%;
+      padding: 9px 40px 9px 14px;
+      border: none;
+      border-radius: 20px;
+      font-size: .95rem;
+      outline: none;
+    }
 
-        /* ===== BUG BADGE ===== */
-        .bug-badge { position: fixed; bottom: 20px; right: 20px; background: #e94560; color: #fff; padding: 10px 18px; border-radius: 25px; font-size: .85rem; font-weight: 700; z-index: 9999; box-shadow: 0 3px 12px rgba(233,69,96,.4); }
+    .header-search button {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #e94560;
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+    }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 900px) { .product-grid, .offers-grid { grid-template-columns: repeat(2, 1fr); } .footer-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 550px) { .product-grid, .offers-grid { grid-template-columns: 1fr; } .footer-grid { grid-template-columns: 1fr; } .header-search { display: none; } .hero h1 { font-size: 1.7rem; } }
-    </style>
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .header-actions a {
+      color: #fff;
+      font-size: .9rem;
+      cursor: pointer;
+    }
+
+    .cart-icon {
+      position: relative;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: #e94560;
+      color: #fff;
+      font-size: .7rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    /* ===== NAV ===== */
+    .main-nav {
+      background: #16213e;
+      padding: 0 30px;
+    }
+
+    .main-nav ul {
+      display: flex;
+      gap: 0;
+    }
+
+    .main-nav li a {
+      display: block;
+      padding: 12px 20px;
+      color: #ccc;
+      font-size: .9rem;
+      transition: background .2s, color .2s;
+    }
+
+    .main-nav li a:hover,
+    .main-nav li a.active {
+      background: #e94560;
+      color: #fff;
+    }
+
+    /* BUG-023: hamburger visible on desktop because of min-width instead of max-width */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    @media (min-width: 768px) {
+
+      /* BUG-023: should be max-width */
+      .hamburger {
+        display: block;
+      }
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #fff;
+      text-align: center;
+      padding: 70px 30px;
+    }
+
+    .hero h1 {
+      font-size: 2.6rem;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: #ccc;
+      margin-bottom: 25px;
+    }
+
+    .hero-btn {
+      display: inline-block;
+      padding: 12px 36px;
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .3s;
+    }
+
+    .hero-btn:hover {
+      background: #c73651;
+    }
+
+    /* ===== PRODUCT GRID ===== */
+    .section-title {
+      text-align: center;
+      font-size: 1.6rem;
+      margin: 40px 0 10px;
+      color: #1a1a2e;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 25px;
+      font-size: .95rem;
+    }
+
+    .sort-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 40px;
+      margin-bottom: 10px;
+    }
+
+    .sort-bar select {
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: .9rem;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      padding: 0 40px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .product-card {
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+      transition: transform .25s, box-shadow .25s;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .13);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: .85rem;
+    }
+
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 14px 16px 18px;
+    }
+
+    .product-name {
+      font-size: .95rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #1a1a2e;
+    }
+
+    /* BUG-024: overflow hidden with no ellipsis for product 7 */
+    .product-card:nth-child(7) .product-name {
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 100px;
+      /* BUG-024: truncated mid-word, no ellipsis */
+    }
+
+    .product-price {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e94560;
+    }
+
+    .product-price .old-price {
+      text-decoration: line-through;
+      color: #999;
+      font-weight: 400;
+      font-size: .9rem;
+      margin-left: 6px;
+    }
+
+    .product-card .btn-add-cart {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: .9rem;
+      font-weight: 600;
+      transition: background .2s;
+    }
+
+    .product-card .btn-add-cart:hover {
+      background: #e94560;
+    }
+
+    .sale-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #e94560;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    /* BUG-025: sale badge on product 6 off-screen */
+    .product-card:nth-child(6) .sale-badge {
+      left: 350px;
+      /* BUG-025: positioned off-screen */
+    }
+
+    .review-link {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: .8rem;
+      color: #e94560;
+    }
+
+    .show-more-wrap {
+      text-align: center;
+      padding: 20px 0 40px;
+    }
+
+    .btn-show-more {
+      padding: 10px 30px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: .9rem;
+    }
+
+    .hidden-products {
+      display: none;
+    }
+
+    /* ===== SPECIAL OFFERS ===== */
+    .offers-section {
+      background: #fff3f3;
+      padding: 40px;
+    }
+
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* ===== NEWSLETTER ===== */
+    .newsletter {
+      background: #1a1a2e;
+      color: #fff;
+      text-align: center;
+      padding: 50px 30px;
+    }
+
+    .newsletter h2 {
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+    }
+
+    .newsletter p {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .newsletter-form input {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 20px;
+      width: 300px;
+      font-size: .95rem;
+    }
+
+    .newsletter-form button {
+      padding: 10px 24px;
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 35px 30px;
+      width: 400px;
+      max-width: 92%;
+      position: relative;
+    }
+
+    .modal h2 {
+      margin-bottom: 20px;
+      color: #1a1a2e;
+    }
+
+    .modal .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .modal label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .85rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 9px 12px;
+      margin-bottom: 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .modal .btn-submit {
+      width: 100%;
+      padding: 10px;
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal .btn-submit:hover {
+      background: #c73651;
+    }
+
+    /* ===== REGISTRATION ===== */
+    .register-section {
+      max-width: 560px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+    }
+
+    .register-section h2 {
+      margin-bottom: 20px;
+      color: #1a1a2e;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .85rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .required-star {
+      color: #e94560;
+    }
+
+    .register-section .btn-submit {
+      padding: 12px 30px;
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== CART ===== */
+    .cart-section {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+    }
+
+    .cart-section h2 {
+      margin-bottom: 20px;
+      color: #1a1a2e;
+    }
+
+    .cart-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .cart-table th,
+    .cart-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cart-table th {
+      background: #f9f9f9;
+      font-size: .85rem;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .cart-table .remove-btn {
+      background: #e94560;
+      color: #fff;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: .8rem;
+    }
+
+    .cart-summary {
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    .cart-summary .total {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 15px;
+    }
+
+    .promo-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .promo-row input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      width: 180px;
+    }
+
+    .promo-row button {
+      padding: 8px 16px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .promo-msg {
+      text-align: right;
+      color: green;
+      font-size: .85rem;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .btn-checkout {
+      padding: 12px 36px;
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== FOOTER ===== */
+    .site-footer {
+      background: #1a1a2e;
+      color: #ccc;
+      padding: 40px 30px 20px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      max-width: 1100px;
+      margin: 0 auto 30px;
+    }
+
+    .footer-col h3 {
+      color: #fff;
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+
+    .footer-col a {
+      display: block;
+      color: #aaa;
+      font-size: .85rem;
+      margin-bottom: 6px;
+      transition: color .2s;
+    }
+
+    .footer-col a:hover {
+      color: #e94560;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .social-icons a {
+      width: 34px;
+      height: 34px;
+      background: #16213e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: .9rem;
+      transition: background .2s;
+    }
+
+    .social-icons a:hover {
+      background: #e94560;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid #2a2a4a;
+      font-size: .8rem;
+      color: #666;
+    }
+
+    /* ===== WISHLIST HEART ===== */
+    .wishlist-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, .85);
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: transform .2s;
+    }
+
+    .wishlist-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .wishlist-btn.active {
+      color: #e94560;
+    }
+
+    .wishlist-count {
+      font-size: .9rem;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* ===== QUICK VIEW MODAL ===== */
+    .quickview-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      z-index: 2500;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quickview-overlay.open {
+      display: flex;
+    }
+
+    .quickview-modal {
+      background: #fff;
+      border-radius: 14px;
+      padding: 30px;
+      width: 500px;
+      max-width: 92%;
+      position: relative;
+      display: flex;
+      gap: 20px;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .quickview-modal img {
+      width: 260px;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 10px;
+      background: #eee;
+    }
+
+    .quickview-modal h3 {
+      font-size: 1.2rem;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+
+    .quickview-modal .qv-price {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e94560;
+    }
+
+    .quickview-modal .qv-desc {
+      font-size: .9rem;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    .quickview-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+    }
+
+    /* ===== BACK-TO-TOP ===== */
+    .back-to-top {
+      position: fixed;
+      bottom: 25px;
+      left: 25px;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: none;
+      z-index: 9998;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
+      transition: opacity .3s;
+    }
+
+    .back-to-top.visible {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== DARK MODE ===== */
+    .dark-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #fff;
+      font-size: .85rem;
+    }
+
+    .dark-toggle input {
+      display: none;
+    }
+
+    .dark-toggle .slider {
+      width: 36px;
+      height: 20px;
+      background: #444;
+      border-radius: 10px;
+      position: relative;
+      transition: background .3s;
+    }
+
+    .dark-toggle .slider::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transition: left .3s;
+    }
+
+    .dark-toggle input:checked+.slider {
+      background: #e94560;
+    }
+
+    .dark-toggle input:checked+.slider::after {
+      left: 18px;
+    }
+
+    body.dark-mode {
+      background: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .product-card {
+      background: #1e1e1e;
+    }
+
+    body.dark-mode .product-name {
+      color: #fff;
+    }
+
+    body.dark-mode .section-title {
+      color: #fff;
+    }
+
+    body.dark-mode .offers-section {
+      background: #1a1a1a;
+    }
+
+    body.dark-mode .register-section,
+    body.dark-mode .cart-section {
+      background: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .register-section h2,
+    body.dark-mode .cart-section h2 {
+      color: #fff;
+    }
+
+    body.dark-mode .modal {
+      background: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .modal h2 {
+      color: #fff;
+    }
+
+    body.dark-mode .contact-section {
+      background: #1e1e1e;
+    }
+
+    body.dark-mode .contact-section h2 {
+      color: #fff;
+    }
+
+    /* ===== STAR RATINGS ===== */
+    .star-rating {
+      display: flex;
+      gap: 2px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    .star-rating span {
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #ccc;
+      transition: color .15s;
+    }
+
+    .star-rating span.filled {
+      color: #f5a623;
+    }
+
+    /* ===== CONTACT FORM ===== */
+    .contact-section {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+    }
+
+    .contact-section h2 {
+      margin-bottom: 20px;
+      color: #1a1a2e;
+    }
+
+    .contact-section .form-group {
+      margin-bottom: 14px;
+    }
+
+    .contact-section .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: .85rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .contact-section .form-group input,
+    .contact-section .form-group textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+    }
+
+    .contact-section .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .contact-section .btn-submit {
+      padding: 12px 30px;
+      background: #e94560;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== IMAGE ZOOM ===== */
+    .zoom-preview {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3000;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .3);
+      padding: 10px;
+    }
+
+    .zoom-preview img {
+      width: 380px;
+      height: 380px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    /* ===== RECENTLY VIEWED ===== */
+    .recently-viewed {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 40px;
+    }
+
+    .recently-viewed h3 {
+      font-size: 1.1rem;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+    }
+
+    .rv-grid {
+      display: flex;
+      gap: 15px;
+    }
+
+    .rv-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+      text-align: center;
+      width: 150px;
+    }
+
+    .rv-card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+
+    .rv-card .rv-name {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    /* ===== COUNTDOWN TIMER ===== */
+    .countdown-wrap {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .countdown {
+      display: inline-flex;
+      gap: 8px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #e94560;
+      background: #fff;
+      padding: 8px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    }
+
+    .countdown .sep {
+      color: #ccc;
+    }
+
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 8px;
+      font-size: .9rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
+      animation: toastSlide .4s ease;
+    }
+
+    @keyframes toastSlide {
+      from {
+        transform: translateX(120%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* ===== BUG BADGE ===== */
+    .bug-badge {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #e94560;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-size: .85rem;
+      font-weight: 700;
+      z-index: 9999;
+      box-shadow: 0 3px 12px rgba(233, 69, 96, .4);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+
+      .product-grid,
+      .offers-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 550px) {
+
+      .product-grid,
+      .offers-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-search {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 1.7rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ===== HEADER ===== -->
-<header class="site-header">
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
     <div class="logo">Shop<span>Buggy</span></div>
     <div class="header-search">
-        <!-- BUG-021: typo "Serach" instead of "Search" -->
-        <form id="searchForm" onsubmit="handleSearch(event)">
-            <input type="text" id="searchInput" placeholder="Serach products..."><!-- BUG-021 -->
-            <button type="submit">&#128269;</button>
-        </form>
+      <!-- BUG-021: typo "Serach" instead of "Search" -->
+      <form id="searchForm" onsubmit="handleSearch(event)">
+        <input type="text" id="searchInput" placeholder="Serach products..."><!-- BUG-021 -->
+        <button type="submit">&#128269;</button>
+      </form>
     </div>
     <div class="header-actions">
-        <a href="#" onclick="openLogin()">Login / Register</a>
-        <div class="cart-icon" onclick="showSection('cart')">
-            &#128722;
-            <!-- BUG-014: cart count hardcoded to 0 and not updated -->
-            <span class="cart-count" id="cartCount">0</span><!-- BUG-014 -->
-        </div>
+      <label class="dark-toggle"><input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()"><span
+          class="slider"></span>
+        &#127769;</label>
+      <span class="wishlist-count" onclick="alert('Wishlist: ' + wishlistItems.length + ' items')">&#9825; <span
+          id="wishlistCount">0</span></span>
+      <a href="#" onclick="openLogin()">Login / Register</a>
+      <div class="cart-icon" onclick="showSection('cart')">
+        &#128722;
+        <!-- BUG-014: cart count hardcoded to 0 and not updated -->
+        <span class="cart-count" id="cartCount">0</span><!-- BUG-014 -->
+      </div>
     </div>
     <!-- BUG-023: hamburger shown on desktop -->
     <button class="hamburger">&#9776;</button><!-- BUG-023 -->
-</header>
+  </header>
 
-<!-- ===== NAVIGATION ===== -->
-<nav class="main-nav">
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="main-nav">
     <ul id="navList">
-        <!-- BUG-026: duplicate id="nav-home" -->
-        <li><a href="#" id="nav-home" class="active" onclick="showSection('home')">Home</a></li><!-- BUG-026 -->
-        <li><a href="#" id="nav-home" onclick="filterCategory('Makeup')">Makeup</a></li><!-- BUG-026: duplicate ID -->
-        <!-- BUG-035: clicking Skincare highlights Makeup -->
-        <li><a href="#" id="nav-skincare" onclick="filterCategory('Skincare')">Skincare</a></li><!-- BUG-035 -->
-        <li><a href="#" id="nav-fragrance" onclick="filterCategory('Fragrance')">Fragrance</a></li>
-        <li><a href="#" id="nav-haircare" onclick="filterCategory('Hair Care')">Hair Care</a></li>
-        <li><a href="#" id="nav-apparel" onclick="filterCategory('Apparel')">Apparel</a></li>
-        <li><a href="#" id="nav-books" onclick="filterCategory('Books')">Books</a></li>
-        <li><a href="#" id="nav-sale" onclick="filterCategory('Sale')">Sale</a></li>
+      <!-- BUG-026: duplicate id="nav-home" -->
+      <li><a href="#" id="nav-home" class="active" onclick="showSection('home')">Home</a></li><!-- BUG-026 -->
+      <li><a href="#" id="nav-home" onclick="filterCategory('Makeup')">Makeup</a></li><!-- BUG-026: duplicate ID -->
+      <!-- BUG-035: clicking Skincare highlights Makeup -->
+      <li><a href="#" id="nav-skincare" onclick="filterCategory('Skincare')">Skincare</a></li><!-- BUG-035 -->
+      <li><a href="#" id="nav-fragrance" onclick="filterCategory('Fragrance')">Fragrance</a></li>
+      <li><a href="#" id="nav-haircare" onclick="filterCategory('Hair Care')">Hair Care</a></li>
+      <li><a href="#" id="nav-apparel" onclick="filterCategory('Apparel')">Apparel</a></li>
+      <li><a href="#" id="nav-books" onclick="filterCategory('Books')">Books</a></li>
+      <li><a href="#" id="nav-sale" onclick="filterCategory('Sale')">Sale</a></li>
     </ul>
-</nav>
+  </nav>
 
-<!-- ===== HERO ===== -->
-<section class="hero" id="sectionHome">
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="sectionHome">
     <h1>Beauty & Lifestyle, Delivered.</h1>
     <p>Discover curated products across Makeup, Skincare, Fragrance, and more.</p>
     <button class="hero-btn" onclick="showSection('home')">Shop Now</button>
-</section>
+  </section>
 
-<!-- ===== SORT BAR ===== -->
-<div class="sort-bar">
+  <!-- ===== SORT BAR ===== -->
+  <div class="sort-bar">
     <!-- BUG-020: sort dropdown does nothing -->
     <select id="sortSelect" onchange="sortProducts()"><!-- BUG-020 -->
-        <option value="">Sort By</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="name-asc">Name: A–Z</option>
+      <option value="">Sort By</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="name-asc">Name: A–Z</option>
     </select>
-</div>
+  </div>
 
-<!-- ===== FEATURED PRODUCTS ===== -->
-<h2 class="section-title">Featured Products</h2>
-<p class="section-subtitle">Hand-picked items just for you</p>
-<div class="product-grid" id="productGrid">
+  <!-- ===== FEATURED PRODUCTS ===== -->
+  <h2 class="section-title">Featured Products</h2>
+  <p class="section-subtitle">Hand-picked items just for you</p>
+  <div class="product-grid" id="productGrid">
 
     <!-- PRODUCT 1 -->
-    <div class="product-card" data-category="Makeup">
-        <div class="product-img">
-            <!-- BUG-036: empty alt -->
-            <img src="https://placehold.co/400x400/fce4ec/e94560?text=Bronzer+Stick" alt=""><!-- BUG-036 -->
-        </div>
-        <div class="product-info">
-            <div class="product-name">Skinsheen Bronzer Stick</div>
-            <div class="product-price">$29.50</div>
-            <!-- BUG-028: dead review link -->
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <!-- BUG-038: no aria-label on add to cart -->
-        <button class="btn-add-cart" onclick="addToCart('Skinsheen Bronzer Stick', 29.50)">&#128722; Add to Cart</button><!-- BUG-038 -->
+    <div class="product-card" data-category="Makeup"
+      data-img="https://placehold.co/400x400/fce4ec/e94560?text=Bronzer+Stick" data-name="Skinsheen Bronzer Stick"
+      data-price="29.50">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'Skinsheen Bronzer Stick')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <!-- BUG-036: empty alt -->
+        <img src="https://placehold.co/400x400/fce4ec/e94560?text=Bronzer+Stick" alt=""><!-- BUG-036 -->
+      </div>
+      <div class="product-info">
+        <div class="product-name">Skinsheen Bronzer Stick</div>
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <div class="product-price">$29.50</div>
+        <!-- BUG-028: dead review link -->
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <!-- BUG-038: no aria-label on add to cart -->
+      <button class="btn-add-cart" onclick="addToCart('Skinsheen Bronzer Stick', 29.50)">&#128722; Add to
+        Cart</button><!-- BUG-038 -->
     </div>
 
     <!-- PRODUCT 2 -->
-    <div class="product-card" data-category="Makeup">
-        <div class="product-img">
-            <!-- BUG-019: broken image src -->
-            <img src="images/typo_img.jpg" alt=""><!-- BUG-019 + BUG-036 -->
-        </div>
-        <div class="product-info">
-            <span class="sale-badge">SALE</span>
-            <div class="product-name">BeneFit Girl Meets Pearl</div>
-            <div class="product-price">$19.00 <span class="old-price">$30.00</span></div>
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <button class="btn-add-cart" onclick="addToCart('BeneFit Girl Meets Pearl', 19.00)">&#128722; Add to Cart</button>
+    <div class="product-card" data-category="Makeup" data-img="images/typo_img.jpg" data-name="BeneFit Girl Meets Pearl"
+      data-price="19.00">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'BeneFit Girl Meets Pearl')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <!-- BUG-019: broken image src -->
+        <img src="images/typo_img.jpg" alt=""><!-- BUG-019 + BUG-036 -->
+      </div>
+      <div class="product-info">
+        <span class="sale-badge">SALE</span>
+        <div class="product-name">BeneFit Girl Meets Pearl</div>
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <div class="product-price">$19.00 <span class="old-price">$30.00</span></div>
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <button class="btn-add-cart" onclick="addToCart('BeneFit Girl Meets Pearl', 19.00)">&#128722; Add to Cart</button>
     </div>
 
     <!-- PRODUCT 3 -->
-    <div class="product-card" data-category="Skincare">
-        <div class="product-img">
-            <img src="https://placehold.co/400x400/e8f5e9/388e3c?text=Bella+Bamba" alt=""><!-- BUG-036 -->
-        </div>
-        <div class="product-info">
-            <div class="product-name">Benefit Bella Bamba</div>
-            <div class="product-price">$28.00</div>
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <!-- BUG-011: broken onclick -->
-        <button class="btn-add-cart" onclick="addToCrt('Benefit Bella Bamba', 28.00)">&#128722; Add to Cart</button><!-- BUG-011 -->
+    <div class="product-card" data-category="Skincare"
+      data-img="https://placehold.co/400x400/e8f5e9/388e3c?text=Bella+Bamba" data-name="Benefit Bella Bamba"
+      data-price="28.00">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'Benefit Bella Bamba')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <img src="https://placehold.co/400x400/e8f5e9/388e3c?text=Bella+Bamba" alt=""><!-- BUG-036 -->
+      </div>
+      <div class="product-info">
+        <div class="product-name">Benefit Bella Bamba</div>
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <div class="product-price">$28.00</div>
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <!-- BUG-011: broken onclick -->
+      <button class="btn-add-cart" onclick="addToCrt('Benefit Bella Bamba', 28.00)">&#128722; Add to
+        Cart</button><!-- BUG-011 -->
     </div>
 
     <!-- PRODUCT 4 -->
-    <div class="product-card" data-category="Makeup">
-        <div class="product-img">
-            <img src="https://placehold.co/400x400/fff3e0/e65100?text=Loose+Bronzer" alt=""><!-- BUG-036 -->
-        </div>
-        <div class="product-info">
-            <div class="product-name">Tropiques Loose Bronzer</div>
-            <div class="product-price">$38.50</div>
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <button class="btn-add-cart" onclick="addToCart('Tropiques Loose Bronzer', 38.50)">&#128722; Add to Cart</button>
+    <div class="product-card" data-category="Makeup"
+      data-img="https://placehold.co/400x400/fff3e0/e65100?text=Loose+Bronzer" data-name="Tropiques Loose Bronzer"
+      data-price="38.50">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'Tropiques Loose Bronzer')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <img src="https://placehold.co/400x400/fff3e0/e65100?text=Loose+Bronzer" alt=""><!-- BUG-036 -->
+      </div>
+      <div class="product-info">
+        <div class="product-name">Tropiques Loose Bronzer</div>
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <div class="product-price">$38.50</div>
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <button class="btn-add-cart" onclick="addToCart('Tropiques Loose Bronzer', 38.50)">&#128722; Add to Cart</button>
     </div>
 
     <!-- PRODUCT 5 -->
-    <div class="product-card" data-category="Skincare">
-        <div class="product-img">
-            <img src="https://placehold.co/400x400/e3f2fd/1565c0?text=Eye+Cells" alt=""><!-- BUG-036 -->
-        </div>
-        <div class="product-info">
-            <!-- BUG-015: SALE badge says 10% OFF but new price is HIGHER than original -->
-            <span class="sale-badge">10% OFF</span><!-- BUG-015 -->
-            <div class="product-name">Absolue Eye Precious Cells</div>
-            <div class="product-price">$110.00 <span class="old-price">$105.00</span></div><!-- BUG-015 -->
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <button class="btn-add-cart" onclick="addToCart('Absolue Eye Precious Cells', 110.00)">&#128722; Add to Cart</button>
+    <div class="product-card" data-category="Skincare"
+      data-img="https://placehold.co/400x400/e3f2fd/1565c0?text=Eye+Cells" data-name="Absolue Eye Precious Cells"
+      data-price="110.00">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'Absolue Eye Precious Cells')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <img src="https://placehold.co/400x400/e3f2fd/1565c0?text=Eye+Cells" alt=""><!-- BUG-036 -->
+      </div>
+      <div class="product-info">
+        <!-- BUG-015: SALE badge says 10% OFF but new price is HIGHER than original -->
+        <span class="sale-badge">10% OFF</span><!-- BUG-015 -->
+        <div class="product-name">Absolue Eye Precious Cells</div>
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <div class="product-price">$110.00 <span class="old-price">$105.00</span></div><!-- BUG-015 -->
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <button class="btn-add-cart" onclick="addToCart('Absolue Eye Precious Cells', 110.00)">&#128722; Add to
+        Cart</button>
     </div>
 
     <!-- PRODUCT 6 -->
-    <div class="product-card" data-category="Skincare">
-        <div class="product-img">
-            <img src="https://placehold.co/400x400/fce4ec/ad1457?text=Moisture+Cream" alt=""><!-- BUG-036 -->
-        </div>
-        <div class="product-info">
-            <!-- BUG-025: sale badge off-screen via CSS -->
-            <span class="sale-badge">SALE</span><!-- BUG-025 -->
-            <div class="product-name">Total Moisture Facial Cream</div>
-            <div class="product-price">$38.00</div>
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <button class="btn-add-cart" onclick="addToCart('Total Moisture Facial Cream', 38.00)">&#128722; Add to Cart</button>
+    <div class="product-card" data-category="Skincare"
+      data-img="https://placehold.co/400x400/fce4ec/ad1457?text=Moisture+Cream" data-name="Total Moisture Facial Cream"
+      data-price="38.00">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'Total Moisture Facial Cream')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <img src="https://placehold.co/400x400/fce4ec/ad1457?text=Moisture+Cream" alt=""><!-- BUG-036 -->
+      </div>
+      <div class="product-info">
+        <!-- BUG-025: sale badge off-screen via CSS -->
+        <span class="sale-badge">SALE</span><!-- BUG-025 -->
+        <div class="product-name">Total Moisture Facial Cream</div>
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <div class="product-price">$38.00</div>
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <button class="btn-add-cart" onclick="addToCart('Total Moisture Facial Cream', 38.00)">&#128722; Add to
+        Cart</button>
     </div>
 
     <!-- PRODUCT 7 -->
-    <div class="product-card" data-category="Skincare">
-        <div class="product-img">
-            <img src="https://placehold.co/400x400/e0f7fa/00695c?text=Body+Gel" alt=""><!-- BUG-036 -->
-        </div>
-        <div class="product-info">
-            <span class="sale-badge">SALE</span>
-            <!-- BUG-024: name truncated via CSS, no ellipsis -->
-            <div class="product-name">Flash Bronzer Body Gel</div><!-- BUG-024 -->
-            <div class="product-price">$29.00 <span class="old-price">$34.50</span></div>
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <button class="btn-add-cart" onclick="addToCart('Flash Bronzer Body Gel', 29.00)">&#128722; Add to Cart</button>
+    <div class="product-card" data-category="Skincare"
+      data-img="https://placehold.co/400x400/e0f7fa/00695c?text=Body+Gel" data-name="Flash Bronzer Body Gel"
+      data-price="29.00">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'Flash Bronzer Body Gel')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <img src="https://placehold.co/400x400/e0f7fa/00695c?text=Body+Gel" alt=""><!-- BUG-036 -->
+      </div>
+      <div class="product-info">
+        <span class="sale-badge">SALE</span>
+        <!-- BUG-024: name truncated via CSS, no ellipsis -->
+        <div class="product-name">Flash Bronzer Body Gel</div><!-- BUG-024 -->
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <div class="product-price">$29.00 <span class="old-price">$34.50</span></div>
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <button class="btn-add-cart" onclick="addToCart('Flash Bronzer Body Gel', 29.00)">&#128722; Add to Cart</button>
     </div>
 
     <!-- PRODUCT 8 -->
-    <div class="product-card" data-category="Fragrance">
-        <div class="product-img">
-            <img src="https://placehold.co/400x400/ede7f6/4a148c?text=Acqua+Di+Gio" alt=""><!-- BUG-036 -->
-        </div>
-        <div class="product-info">
-            <span class="sale-badge">SALE</span>
-            <div class="product-name">Acqua Di Gio Pour Homme</div>
-            <!-- BUG-018: currency inconsistency €45.00 vs $ -->
-            <div class="product-price">€45.00 <span class="old-price">$59.00</span></div><!-- BUG-018 -->
-            <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
-        </div>
-        <button class="btn-add-cart" onclick="addToCart('Acqua Di Gio Pour Homme', 45.00)">&#128722; Add to Cart</button>
+    <div class="product-card" data-category="Fragrance"
+      data-img="https://placehold.co/400x400/ede7f6/4a148c?text=Acqua+Di+Gio" data-name="Acqua Di Gio Pour Homme"
+      data-price="45.00">
+      <button class="wishlist-btn" onclick="toggleWishlist(this, 'Acqua Di Gio Pour Homme')">&#9825;</button>
+      <div class="product-img" onclick="openQuickView(this.parentElement)" onmouseenter="showZoom(this)"
+        onmouseleave="hideZoom()">
+        <img src="https://placehold.co/400x400/ede7f6/4a148c?text=Acqua+Di+Gio" alt=""><!-- BUG-036 -->
+      </div>
+      <div class="product-info">
+        <span class="sale-badge">SALE</span>
+        <div class="product-name">Acqua Di Gio Pour Homme</div>
+        <div class="star-rating" data-rating="0"><span onclick="setRating(this,1)">&#9733;</span><span
+            onclick="setRating(this,2)">&#9733;</span><span onclick="setRating(this,3)">&#9733;</span><span
+            onclick="setRating(this,4)">&#9733;</span><span onclick="setRating(this,5)">&#9733;</span></div>
+        <!-- BUG-018: currency inconsistency €45.00 vs $ -->
+        <div class="product-price">€45.00 <span class="old-price">$59.00</span></div><!-- BUG-018 -->
+        <a href="#" class="review-link">Write a Review</a><!-- BUG-028 -->
+      </div>
+      <button class="btn-add-cart" onclick="addToCart('Acqua Di Gio Pour Homme', 45.00)">&#128722; Add to Cart</button>
     </div>
-</div>
+  </div>
 
-<!-- Show More -->
-<div class="show-more-wrap">
+  <!-- Show More -->
+  <div class="show-more-wrap">
     <!-- BUG-033: button label never changes to "Show Less" -->
     <button class="btn-show-more" onclick="toggleMore()">Show More</button><!-- BUG-033 -->
-</div>
-<div class="hidden-products" id="hiddenProducts">
+  </div>
+  <div class="hidden-products" id="hiddenProducts">
     <div class="product-grid">
-        <div class="product-card" data-category="Hair Care">
-            <div class="product-img"><img src="https://placehold.co/400x400/f3e5f5/7b1fa2?text=Hair+Serum" alt=""></div>
-            <div class="product-info"><div class="product-name">Silk Repair Hair Serum</div><div class="product-price">$22.00</div></div>
-            <button class="btn-add-cart" onclick="addToCart('Silk Repair Hair Serum', 22.00)">&#128722; Add to Cart</button>
+      <div class="product-card" data-category="Hair Care">
+        <div class="product-img"><img src="https://placehold.co/400x400/f3e5f5/7b1fa2?text=Hair+Serum" alt=""></div>
+        <div class="product-info">
+          <div class="product-name">Silk Repair Hair Serum</div>
+          <div class="product-price">$22.00</div>
         </div>
-        <div class="product-card" data-category="Apparel">
-            <div class="product-img"><img src="https://placehold.co/400x400/efebe9/4e342e?text=Cotton+Tee" alt=""></div>
-            <div class="product-info"><div class="product-name">Classic Cotton Tee</div><div class="product-price">$18.00</div></div>
-            <button class="btn-add-cart" onclick="addToCart('Classic Cotton Tee', 18.00)">&#128722; Add to Cart</button>
+        <button class="btn-add-cart" onclick="addToCart('Silk Repair Hair Serum', 22.00)">&#128722; Add to Cart</button>
+      </div>
+      <div class="product-card" data-category="Apparel">
+        <div class="product-img"><img src="https://placehold.co/400x400/efebe9/4e342e?text=Cotton+Tee" alt=""></div>
+        <div class="product-info">
+          <div class="product-name">Classic Cotton Tee</div>
+          <div class="product-price">$18.00</div>
         </div>
+        <button class="btn-add-cart" onclick="addToCart('Classic Cotton Tee', 18.00)">&#128722; Add to Cart</button>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- ===== SPECIAL OFFERS ===== -->
-<section class="offers-section">
+  <!-- ===== SPECIAL OFFERS ===== -->
+  <section class="offers-section">
     <h2 class="section-title">Special Offers</h2>
+    <!-- BUG-042: Countdown timer counts UP instead of down -->
+    <div class="countdown-wrap">
+      <div class="countdown" id="flashCountdown">
+        <span id="hours">00</span><span class="sep">:</span>
+        <span id="mins">00</span><span class="sep">:</span>
+        <span id="secs">00</span>
+      </div>
+    </div>
     <p class="section-subtitle">Limited-time deals you don't want to miss</p>
     <div class="offers-grid">
-        <div class="product-card">
-            <div class="product-img"><img src="https://placehold.co/400x400/fce4ec/e94560?text=Lip+Gloss" alt=""></div>
-            <div class="product-info"><span class="sale-badge">20% OFF</span><div class="product-name">Velvet Lip Gloss Set</div><div class="product-price">$16.00 <span class="old-price">$20.00</span></div></div>
-            <button class="btn-add-cart" onclick="addToCart('Velvet Lip Gloss Set', 16.00)">&#128722; Add to Cart</button>
+      <div class="product-card">
+        <div class="product-img"><img src="https://placehold.co/400x400/fce4ec/e94560?text=Lip+Gloss" alt=""></div>
+        <div class="product-info"><span class="sale-badge">20% OFF</span>
+          <div class="product-name">Velvet Lip Gloss Set</div>
+          <div class="product-price">$16.00 <span class="old-price">$20.00</span></div>
         </div>
-        <div class="product-card">
-            <div class="product-img"><img src="https://placehold.co/400x400/e8eaf6/283593?text=Night+Cream" alt=""></div>
-            <div class="product-info"><span class="sale-badge">15% OFF</span><div class="product-name">Radiance Night Cream</div><div class="product-price">$34.00 <span class="old-price">$40.00</span></div></div>
-            <button class="btn-add-cart" onclick="addToCart('Radiance Night Cream', 34.00)">&#128722; Add to Cart</button>
+        <button class="btn-add-cart" onclick="addToCart('Velvet Lip Gloss Set', 16.00)">&#128722; Add to Cart</button>
+      </div>
+      <div class="product-card">
+        <div class="product-img"><img src="https://placehold.co/400x400/e8eaf6/283593?text=Night+Cream" alt=""></div>
+        <div class="product-info"><span class="sale-badge">15% OFF</span>
+          <div class="product-name">Radiance Night Cream</div>
+          <div class="product-price">$34.00 <span class="old-price">$40.00</span></div>
         </div>
-        <div class="product-card">
-            <div class="product-img"><img src="https://placehold.co/400x400/e0f2f1/00695c?text=Body+Lotion" alt=""></div>
-            <div class="product-info"><span class="sale-badge">25% OFF</span><div class="product-name">Hydra Body Lotion</div><div class="product-price">$12.00 <span class="old-price">$16.00</span></div></div>
-            <button class="btn-add-cart" onclick="addToCart('Hydra Body Lotion', 12.00)">&#128722; Add to Cart</button>
+        <button class="btn-add-cart" onclick="addToCart('Radiance Night Cream', 34.00)">&#128722; Add to Cart</button>
+      </div>
+      <div class="product-card">
+        <div class="product-img"><img src="https://placehold.co/400x400/e0f2f1/00695c?text=Body+Lotion" alt=""></div>
+        <div class="product-info"><span class="sale-badge">25% OFF</span>
+          <div class="product-name">Hydra Body Lotion</div>
+          <div class="product-price">$12.00 <span class="old-price">$16.00</span></div>
         </div>
+        <button class="btn-add-cart" onclick="addToCart('Hydra Body Lotion', 12.00)">&#128722; Add to Cart</button>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- ===== NEWSLETTER ===== -->
-<section class="newsletter">
+  <!-- ===== NEWSLETTER ===== -->
+  <section class="newsletter">
     <h2>Stay in the Loop</h2>
     <p>Subscribe to get exclusive offers and beauty tips straight to your inbox.</p>
     <div class="newsletter-form">
-        <input type="email" placeholder="Enter your email" id="newsletterEmail">
-        <!-- BUG-007: subscribe button does nothing -->
-        <button id="subscribeBtn">Subscribe</button><!-- BUG-007: no event listener attached -->
+      <input type="email" placeholder="Enter your email" id="newsletterEmail">
+      <!-- BUG-007: subscribe button does nothing -->
+      <button id="subscribeBtn">Subscribe</button><!-- BUG-007: no event listener attached -->
     </div>
-</section>
+  </section>
 
-<!-- ===== LOGIN MODAL ===== -->
-<div class="modal-overlay" id="loginModal">
+  <!-- ===== LOGIN MODAL ===== -->
+  <div class="modal-overlay" id="loginModal">
     <div class="modal">
-        <!-- BUG-030: close button also submits form -->
-        <button class="close-btn" onclick="closeLoginAndSubmit()">&#10005;</button><!-- BUG-030 -->
-        <h2>Login</h2>
-        <!-- BUG-001: form submits even when empty -->
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <!-- BUG-037: label for doesn't match input id -->
-            <label for="username">Email Address</label><!-- BUG-037 -->
-            <input type="text" id="loginEmail" placeholder="you@example.com">
-            <label for="pwd">Password</label><!-- BUG-037 -->
-            <!-- BUG-009: password field is type="text" -->
-            <input type="text" id="loginPassword" placeholder="Password"><!-- BUG-009 -->
-            <button type="submit" class="btn-submit">Login</button><!-- BUG-001 -->
-        </form>
-        <p style="text-align:center;margin-top:12px;font-size:.85rem;color:#888;">Don't have an account? <a href="#registration" style="color:#e94560;" onclick="closeLogin();showSection('register')">Register</a></p>
+      <!-- BUG-030: close button also submits form -->
+      <button class="close-btn" onclick="closeLoginAndSubmit()">&#10005;</button><!-- BUG-030 -->
+      <h2>Login</h2>
+      <!-- BUG-001: form submits even when empty -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <!-- BUG-037: label for doesn't match input id -->
+        <label for="username">Email Address</label><!-- BUG-037 -->
+        <input type="text" id="loginEmail" placeholder="you@example.com">
+        <label for="pwd">Password</label><!-- BUG-037 -->
+        <!-- BUG-009: password field is type="text" -->
+        <input type="text" id="loginPassword" placeholder="Password"><!-- BUG-009 -->
+        <button type="submit" class="btn-submit">Login</button><!-- BUG-001 -->
+      </form>
+      <p style="text-align:center;margin-top:12px;font-size:.85rem;color:#888;">Don't have an account? <a
+          href="#registration" style="color:#e94560;" onclick="closeLogin();showSection('register')">Register</a></p>
     </div>
-</div>
+  </div>
 
-<!-- ===== REGISTRATION FORM ===== -->
-<section class="register-section" id="sectionRegister" style="display:none;">
+  <!-- ===== REGISTRATION FORM ===== -->
+  <section class="register-section" id="sectionRegister" style="display:none;">
     <h2>Create an Account</h2>
     <form id="registerForm" onsubmit="handleRegister(event)">
-        <div class="form-group">
-            <!-- BUG-037: label for doesn't match -->
-            <label for="fname">First Name <span class="required-star">*</span></label><!-- BUG-037 -->
-            <!-- BUG-005: maxlength="2" -->
-            <input type="text" id="regFirstName" maxlength="2" required><!-- BUG-005 -->
-        </div>
-        <div class="form-group">
-            <label for="lname">Last Name <span class="required-star">*</span></label>
-            <input type="text" id="regLastName" required>
-        </div>
-        <div class="form-group">
-            <!-- BUG-006: asterisk shown but not required -->
-            <label for="mname">Middle Name <span class="required-star">*</span></label><!-- BUG-006 -->
-            <input type="text" id="regMiddleName"><!-- BUG-006: not actually required -->
-        </div>
-        <div class="form-group">
-            <!-- BUG-002: no email validation -->
-            <label for="regemail">Email <span class="required-star">*</span></label><!-- BUG-037 -->
-            <input type="text" id="regEmail" required><!-- BUG-002: type="text" instead of type="email" -->
-        </div>
-        <div class="form-group">
-            <label for="regphone">Phone Number</label><!-- BUG-037 -->
-            <!-- BUG-004: phone accepts letters -->
-            <input type="text" id="regPhone"><!-- BUG-004 -->
-        </div>
-        <div class="form-group">
-            <!-- BUG-010: no max date on DOB -->
-            <label for="dob">Date of Birth</label><!-- BUG-037 -->
-            <input type="date" id="regDOB"><!-- BUG-010 -->
-        </div>
-        <div class="form-group">
-            <label for="regpwd">Password <span class="required-star">*</span></label>
-            <input type="password" id="regPassword" required>
-        </div>
-        <div class="form-group">
-            <!-- BUG-003: no match check -->
-            <label for="regcpwd">Confirm Password <span class="required-star">*</span></label>
-            <input type="password" id="regConfirmPassword" required><!-- BUG-003 -->
-        </div>
-        <!-- BUG-008: button says "Reset" instead of "Submit" -->
-        <button type="submit" class="btn-submit" value="Reset">Reset</button><!-- BUG-008 -->
+      <div class="form-group">
+        <!-- BUG-037: label for doesn't match -->
+        <label for="fname">First Name <span class="required-star">*</span></label><!-- BUG-037 -->
+        <!-- BUG-005: maxlength="2" -->
+        <input type="text" id="regFirstName" maxlength="2" required><!-- BUG-005 -->
+      </div>
+      <div class="form-group">
+        <label for="lname">Last Name <span class="required-star">*</span></label>
+        <input type="text" id="regLastName" required>
+      </div>
+      <div class="form-group">
+        <!-- BUG-006: asterisk shown but not required -->
+        <label for="mname">Middle Name <span class="required-star">*</span></label><!-- BUG-006 -->
+        <input type="text" id="regMiddleName"><!-- BUG-006: not actually required -->
+      </div>
+      <div class="form-group">
+        <!-- BUG-002: no email validation -->
+        <label for="regemail">Email <span class="required-star">*</span></label><!-- BUG-037 -->
+        <input type="text" id="regEmail" required><!-- BUG-002: type="text" instead of type="email" -->
+      </div>
+      <div class="form-group">
+        <label for="regphone">Phone Number</label><!-- BUG-037 -->
+        <!-- BUG-004: phone accepts letters -->
+        <input type="text" id="regPhone"><!-- BUG-004 -->
+      </div>
+      <div class="form-group">
+        <!-- BUG-010: no max date on DOB -->
+        <label for="dob">Date of Birth</label><!-- BUG-037 -->
+        <input type="date" id="regDOB"><!-- BUG-010 -->
+      </div>
+      <div class="form-group">
+        <label for="regpwd">Password <span class="required-star">*</span></label>
+        <input type="password" id="regPassword" required>
+      </div>
+      <div class="form-group">
+        <!-- BUG-003: no match check -->
+        <label for="regcpwd">Confirm Password <span class="required-star">*</span></label>
+        <input type="password" id="regConfirmPassword" required><!-- BUG-003 -->
+      </div>
+      <!-- BUG-008: button says "Reset" instead of "Submit" -->
+      <button type="submit" class="btn-submit" value="Reset">Reset</button><!-- BUG-008 -->
     </form>
-</section>
+  </section>
 
-<!-- ===== CART SECTION ===== -->
-<section class="cart-section" id="sectionCart" style="display:none;">
+  <!-- ===== CART SECTION ===== -->
+  <section class="cart-section" id="sectionCart" style="display:none;">
     <h2>Your Shopping Cart</h2>
     <table class="cart-table">
-        <thead>
-            <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th><th></th></tr>
-        </thead>
-        <tbody id="cartBody"></tbody>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cartBody"></tbody>
     </table>
     <div class="promo-row">
-        <input type="text" id="promoInput" placeholder="Promo code">
-        <!-- BUG-034: promo code shows success but doesn't discount -->
-        <button onclick="applyPromo()">Apply</button><!-- BUG-034 -->
+      <input type="text" id="promoInput" placeholder="Promo code">
+      <!-- BUG-034: promo code shows success but doesn't discount -->
+      <button onclick="applyPromo()">Apply</button><!-- BUG-034 -->
     </div>
     <div class="promo-msg" id="promoMsg">&#10003; Code "SAVE10" applied successfully!</div><!-- BUG-034 -->
     <div class="cart-summary">
-        <div class="total" id="cartTotal">Total: $0.00</div>
-        <!-- BUG-017: checkout navigates to # -->
-        <a href="#"><button class="btn-checkout">Proceed to Checkout</button></a><!-- BUG-017 -->
+      <div class="total" id="cartTotal">Total: $0.00</div>
+      <!-- BUG-017: checkout navigates to # -->
+      <a href="#"><button class="btn-checkout">Proceed to Checkout</button></a><!-- BUG-017 -->
     </div>
-</section>
+  </section>
 
-<!-- ===== FOOTER ===== -->
-<footer class="site-footer">
+  <!-- ===== RECENTLY VIEWED ===== -->
+  <!-- BUG-041: Shows items in wrong order (oldest first) -->
+  <section class="recently-viewed" id="sectionRecentlyViewed" style="display:none;">
+    <h3>Recently Viewed</h3>
+    <div class="rv-grid" id="rvGrid"></div>
+  </section>
+
+  <!-- ===== CONTACT US (BUG-039) ===== -->
+  <section class="contact-section">
+    <h2>Contact Us</h2>
+    <form id="contactForm" onsubmit="handleContact(event)">
+      <div class="form-group">
+        <label for="contactName">Name</label>
+        <input type="text" id="contactName" required>
+      </div>
+      <div class="form-group">
+        <label for="contactEmail">Email Address</label>
+        <!-- BUG-039: type="text" allows invalid email formats -->
+        <input type="text" id="contactEmail" required><!-- BUG-039 -->
+      </div>
+      <div class="form-group">
+        <label for="contactMessage">Message</label>
+        <textarea id="contactMessage" required></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Send Message</button>
+    </form>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
     <div class="footer-grid">
-        <div class="footer-col">
-            <h3>Shop<span style="color:#e94560;">Buggy</span></h3>
-            <p style="font-size:.85rem;color:#888;margin-top:6px;">Your one-stop beauty & lifestyle store. Quality products, great prices.</p>
+      <div class="footer-col">
+        <h3>Shop<span style="color:#e94560;">Buggy</span></h3>
+        <p style="font-size:.85rem;color:#888;margin-top:6px;">Your one-stop beauty & lifestyle store. Quality products,
+          great prices.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Quick Links</h3>
+        <a href="#">About Us</a>
+        <a href="#">Contact</a>
+        <a href="#">FAQs</a>
+        <a href="#">Careers</a>
+      </div>
+      <div class="footer-col">
+        <h3>Policies</h3>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Return Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Shipping Info</a>
+      </div>
+      <div class="footer-col">
+        <h3>Follow Us</h3>
+        <div class="social-icons">
+          <a href="#">f</a>
+          <a href="#">t</a>
+          <a href="#">in</a>
+          <a href="#">ig</a>
         </div>
-        <div class="footer-col">
-            <h3>Quick Links</h3>
-            <a href="#">About Us</a>
-            <a href="#">Contact</a>
-            <a href="#">FAQs</a>
-            <a href="#">Careers</a>
-        </div>
-        <div class="footer-col">
-            <h3>Policies</h3>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Return Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Shipping Info</a>
-        </div>
-        <div class="footer-col">
-            <h3>Follow Us</h3>
-            <div class="social-icons">
-                <a href="#">f</a>
-                <a href="#">t</a>
-                <a href="#">in</a>
-                <a href="#">ig</a>
-            </div>
-        </div>
+      </div>
     </div>
     <!-- BUG-022: copyright year hardcoded as 2018 -->
     <div class="footer-bottom">&copy; 2018 ShopBuggy. All rights reserved.</div><!-- BUG-022 -->
-</footer>
+  </footer>
 
-<!-- ===== BUG COUNT BADGE ===== -->
-<div class="bug-badge">&#128027; Bug Count: 38</div>
+  <!-- ===== BUG COUNT BADGE ===== -->
 
-<!-- ===== HIDDEN ANSWER KEY ===== -->
-<div id="bug-answer-key" style="display:none;">
-[
-  {"id":"BUG-001","description":"Login form submits successfully even when both fields are empty"},
-  {"id":"BUG-002","description":"Email field in registration accepts invalid formats — no validation"},
-  {"id":"BUG-003","description":"Password and Confirm Password fields do not check if they match"},
-  {"id":"BUG-004","description":"Phone number field accepts alphabetical characters"},
-  {"id":"BUG-005","description":"First Name field has maxlength=2 — only 2 characters allowed"},
-  {"id":"BUG-006","description":"Required asterisk on Middle Name but the field is not actually required"},
-  {"id":"BUG-007","description":"Newsletter subscribe button does nothing — no event listener"},
-  {"id":"BUG-008","description":"Registration Submit button label says Reset"},
-  {"id":"BUG-009","description":"Login password field is type=text — password is visible"},
-  {"id":"BUG-010","description":"Date of Birth field accepts future dates with no max constraint"},
-  {"id":"BUG-011","description":"Add to Cart on Product 3 calls nonexistent function addToCrt()"},
-  {"id":"BUG-012","description":"Cart total adds an extra copy of the last item price"},
-  {"id":"BUG-013","description":"Removing item decreases count but subtotal does not update"},
-  {"id":"BUG-014","description":"Cart badge in header always shows 0"},
-  {"id":"BUG-015","description":"Product 5 sale badge says 10% OFF but new price is higher than original"},
-  {"id":"BUG-016","description":"Cart quantity input allows 0 and negative numbers"},
-  {"id":"BUG-017","description":"Checkout button navigates to # instead of checkout"},
-  {"id":"BUG-018","description":"Product 8 uses € while all others use $"},
-  {"id":"BUG-019","description":"Product 2 has a broken image src"},
-  {"id":"BUG-020","description":"Sort dropdown does not re-sort products"},
-  {"id":"BUG-021","description":"Search bar placeholder has typo: Serach instead of Search"},
-  {"id":"BUG-022","description":"Footer copyright year hardcoded as 2018"},
-  {"id":"BUG-023","description":"Hamburger menu visible on desktop — uses min-width instead of max-width"},
-  {"id":"BUG-024","description":"Product 7 name truncated mid-word with no ellipsis"},
-  {"id":"BUG-025","description":"Sale badge on Product 6 positioned off-screen"},
-  {"id":"BUG-026","description":"Two nav links both have id=nav-home (duplicate IDs)"},
-  {"id":"BUG-027","description":"Page title says Untitled Document"},
-  {"id":"BUG-028","description":"Write Review links are dead href=# links"},
-  {"id":"BUG-029","description":"Search clears input before redirect"},
-  {"id":"BUG-030","description":"Modal close button also submits login form silently"},
-  {"id":"BUG-031","description":"Add to Cart adds duplicate entries instead of incrementing quantity"},
-  {"id":"BUG-032","description":"console.error triggered on page load from undefined.property"},
-  {"id":"BUG-033","description":"Show More button label never changes to Show Less"},
-  {"id":"BUG-034","description":"Promo code SAVE10 shows success but does not reduce total"},
-  {"id":"BUG-035","description":"Clicking Skincare highlights Makeup as active"},
-  {"id":"BUG-036","description":"All product images have empty alt attributes"},
-  {"id":"BUG-037","description":"Form labels for attributes do not match input ids"},
-  {"id":"BUG-038","description":"Add to Cart buttons have no aria-label — icon only not accessible"}
-]
-</div>
 
-<!-- ===== JAVASCRIPT ===== -->
-<script>
+  <!-- ===== HIDDEN ANSWER KEY ===== -->
+  <div id="bug-answer-key" style="display:none;">
+    [
+    {"id":"BUG-001","description":"Login form submits successfully even when both fields are empty"},
+    {"id":"BUG-002","description":"Email field in registration accepts invalid formats — no validation"},
+    {"id":"BUG-003","description":"Password and Confirm Password fields do not check if they match"},
+    {"id":"BUG-004","description":"Phone number field accepts alphabetical characters"},
+    {"id":"BUG-005","description":"First Name field has maxlength=2 — only 2 characters allowed"},
+    {"id":"BUG-006","description":"Required asterisk on Middle Name but the field is not actually required"},
+    {"id":"BUG-007","description":"Newsletter subscribe button does nothing — no event listener"},
+    {"id":"BUG-008","description":"Registration Submit button label says Reset"},
+    {"id":"BUG-009","description":"Login password field is type=text — password is visible"},
+    {"id":"BUG-010","description":"Date of Birth field accepts future dates with no max constraint"},
+    {"id":"BUG-011","description":"Add to Cart on Product 3 calls nonexistent function addToCrt()"},
+    {"id":"BUG-012","description":"Cart total adds an extra copy of the last item price"},
+    {"id":"BUG-013","description":"Removing item decreases count but subtotal does not update"},
+    {"id":"BUG-014","description":"Cart badge in header always shows 0"},
+    {"id":"BUG-015","description":"Product 5 sale badge says 10% OFF but new price is higher than original"},
+    {"id":"BUG-016","description":"Cart quantity input allows 0 and negative numbers"},
+    {"id":"BUG-017","description":"Checkout button navigates to # instead of checkout"},
+    {"id":"BUG-018","description":"Product 8 uses € while all others use $"},
+    {"id":"BUG-019","description":"Product 2 has a broken image src"},
+    {"id":"BUG-020","description":"Sort dropdown does not re-sort products"},
+    {"id":"BUG-021","description":"Search bar placeholder has typo: Serach instead of Search"},
+    {"id":"BUG-022","description":"Footer copyright year hardcoded as 2018"},
+    {"id":"BUG-023","description":"Hamburger menu visible on desktop — uses min-width instead of max-width"},
+    {"id":"BUG-024","description":"Product 7 name truncated mid-word with no ellipsis"},
+    {"id":"BUG-025","description":"Sale badge on Product 6 positioned off-screen"},
+    {"id":"BUG-026","description":"Two nav links both have id=nav-home (duplicate IDs)"},
+    {"id":"BUG-027","description":"Page title says Untitled Document"},
+    {"id":"BUG-028","description":"Write Review links are dead href=# links"},
+    {"id":"BUG-029","description":"Search clears input before redirect"},
+    {"id":"BUG-030","description":"Modal close button also submits login form silently"},
+    {"id":"BUG-031","description":"Add to Cart adds duplicate entries instead of incrementing quantity"},
+    {"id":"BUG-032","description":"console.error triggered on page load from undefined.property"},
+    {"id":"BUG-033","description":"Show More button label never changes to Show Less"},
+    {"id":"BUG-034","description":"Promo code SAVE10 shows success but does not reduce total"},
+    {"id":"BUG-035","description":"Clicking Skincare highlights Makeup as active"},
+    {"id":"BUG-036","description":"All product images have empty alt attributes"},
+    {"id":"BUG-037","description":"Form labels for attributes do not match input ids"},
+    {"id":"BUG-038","description":"Add to Cart buttons have no aria-label — icon only not accessible"},
+    {"id":"BUG-039","description":"Contact form email field has no validation (type=text)"},
+    {"id":"BUG-040","description":"Image zoom always shows the same product (Product 1)"},
+    {"id":"BUG-041","description":"Recently viewed items shown in wrong order (oldest first)"},
+    {"id":"BUG-042","description":"Flash sale countdown timer counts UP instead of down"},
+    {"id":"BUG-043","description":"Toast notification always shows 'Skinsheen Bronzer Stick' regardless of product
+    added"}
+    ]
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
     // BUG-032: deliberate console.error on page load
     try {
-        var x = undefined;
-        x.property; // BUG-032
-    } catch(e) {
-        console.error('BUG-032: Uncaught reference -', e.message);
+      var x = undefined;
+      x.property; // BUG-032
+    } catch (e) {
+      console.error('BUG-032: Uncaught reference -', e.message);
     }
 
     // ===== CART STATE =====
@@ -560,173 +1723,334 @@
 
     // ===== SECTION SWITCHING =====
     function showSection(section) {
-        document.getElementById('sectionRegister').style.display = 'none';
-        document.getElementById('sectionCart').style.display = 'none';
-        document.getElementById('sectionHome').style.display = '';
-        document.querySelector('.sort-bar').style.display = '';
-        document.querySelector('.product-grid').style.display = '';
-        document.querySelector('.show-more-wrap').style.display = '';
-        document.querySelector('.offers-section').style.display = '';
-        document.querySelector('.newsletter').style.display = '';
+      document.getElementById('sectionRegister').style.display = 'none';
+      document.getElementById('sectionCart').style.display = 'none';
+      document.getElementById('sectionHome').style.display = '';
+      document.querySelector('.sort-bar').style.display = '';
+      document.querySelector('.product-grid').style.display = '';
+      document.querySelector('.show-more-wrap').style.display = '';
+      document.querySelector('.offers-section').style.display = '';
+      document.querySelector('.newsletter').style.display = '';
 
-        if (section === 'register') {
-            document.getElementById('sectionHome').style.display = 'none';
-            document.querySelector('.sort-bar').style.display = 'none';
-            document.querySelector('.product-grid').style.display = 'none';
-            document.querySelector('.show-more-wrap').style.display = 'none';
-            document.querySelector('.offers-section').style.display = 'none';
-            document.querySelector('.newsletter').style.display = 'none';
-            document.getElementById('sectionRegister').style.display = '';
-        } else if (section === 'cart') {
-            document.getElementById('sectionHome').style.display = 'none';
-            document.querySelector('.sort-bar').style.display = 'none';
-            document.querySelector('.product-grid').style.display = 'none';
-            document.querySelector('.show-more-wrap').style.display = 'none';
-            document.querySelector('.offers-section').style.display = 'none';
-            document.querySelector('.newsletter').style.display = 'none';
-            document.getElementById('sectionCart').style.display = '';
-            renderCart();
-        }
+      if (section === 'register') {
+        document.getElementById('sectionHome').style.display = 'none';
+        document.querySelector('.sort-bar').style.display = 'none';
+        document.querySelector('.product-grid').style.display = 'none';
+        document.querySelector('.show-more-wrap').style.display = 'none';
+        document.querySelector('.offers-section').style.display = 'none';
+        document.querySelector('.newsletter').style.display = 'none';
+        document.getElementById('sectionRegister').style.display = '';
+      } else if (section === 'cart') {
+        document.getElementById('sectionHome').style.display = 'none';
+        document.querySelector('.sort-bar').style.display = 'none';
+        document.querySelector('.product-grid').style.display = 'none';
+        document.querySelector('.show-more-wrap').style.display = 'none';
+        document.querySelector('.offers-section').style.display = 'none';
+        document.querySelector('.newsletter').style.display = 'none';
+        document.getElementById('sectionCart').style.display = '';
+        renderCart();
+      }
     }
 
     // ===== LOGIN MODAL =====
     function openLogin() {
-        document.getElementById('loginModal').classList.add('open');
+      document.getElementById('loginModal').classList.add('open');
     }
     function closeLogin() {
-        document.getElementById('loginModal').classList.remove('open');
+      document.getElementById('loginModal').classList.remove('open');
     }
     // BUG-030: close button also submits login form
     function closeLoginAndSubmit() {
-        document.getElementById('loginForm').requestSubmit(); // BUG-030
-        closeLogin();
+      document.getElementById('loginForm').requestSubmit(); // BUG-030
+      closeLogin();
     }
 
     // BUG-001: login form submits even when empty
     function handleLogin(e) {
-        e.preventDefault();
-        // BUG-001: no validation at all
-        alert('Login successful!');
-        closeLogin();
+      e.preventDefault();
+      // BUG-001: no validation at all
+      alert('Login successful!');
+      closeLogin();
     }
 
     // ===== REGISTRATION =====
     // BUG-002, BUG-003: no email validation, no password match check
     function handleRegister(e) {
-        e.preventDefault();
-        // BUG-002: no email format check
-        // BUG-003: no password match check
-        // BUG-004: no phone number validation
-        alert('Registration successful!');
+      e.preventDefault();
+      // BUG-002: no email format check
+      // BUG-003: no password match check
+      // BUG-004: no phone number validation
+      alert('Registration successful!');
     }
 
     // ===== SEARCH =====
     // BUG-029: clears input before redirect
     function handleSearch(e) {
-        e.preventDefault();
-        var input = document.getElementById('searchInput');
-        var query = input.value;
-        input.value = ''; // BUG-029: clears text before using it
-        if (query) {
-            window.location.href = '#search?q=' + encodeURIComponent(query);
-        }
+      e.preventDefault();
+      var input = document.getElementById('searchInput');
+      var query = input.value;
+      input.value = ''; // BUG-029: clears text before using it
+      if (query) {
+        window.location.href = '#search?q=' + encodeURIComponent(query);
+      }
     }
 
     // ===== CART FUNCTIONS =====
     // BUG-031: adds duplicate entries instead of incrementing
     function addToCart(name, price) {
-        // BUG-031: always pushes new entry, never checks if item exists
-        cart.push({ name: name, price: price, qty: 1 });
-        // BUG-014: we intentionally do NOT update cartCount display
-        alert(name + ' added to cart!');
+      // BUG-031: always pushes new entry, never checks if item exists
+      cart.push({ name: name, price: price, qty: 1 });
+      // BUG-014: we intentionally do NOT update cartCount display
+      alert(name + ' added to cart!');
     }
 
     function renderCart() {
-        var tbody = document.getElementById('cartBody');
-        tbody.innerHTML = '';
-        var total = 0;
-        for (var i = 0; i < cart.length; i++) {
-            var item = cart[i];
-            var subtotal = item.price * item.qty;
-            total += subtotal;
-            var tr = document.createElement('tr');
-            tr.innerHTML =
-                '<td>' + item.name + '</td>' +
-                '<td>$' + item.price.toFixed(2) + '</td>' +
-                // BUG-016: no min constraint on quantity input
-                '<td><input type="number" value="' + item.qty + '" style="width:60px;padding:4px;" onchange="updateQty(' + i + ', this.value)"></td>' + // BUG-016
-                '<td>$' + subtotal.toFixed(2) + '</td>' +
-                '<td><button class="remove-btn" onclick="removeItem(' + i + ')">Remove</button></td>';
-            tbody.appendChild(tr);
-        }
-        // BUG-012: add extra copy of last item price
-        if (cart.length > 0) {
-            total += cart[cart.length - 1].price; // BUG-012
-        }
-        document.getElementById('cartTotal').textContent = 'Total: $' + total.toFixed(2);
+      var tbody = document.getElementById('cartBody');
+      tbody.innerHTML = '';
+      var total = 0;
+      for (var i = 0; i < cart.length; i++) {
+        var item = cart[i];
+        var subtotal = item.price * item.qty;
+        total += subtotal;
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + item.name + '</td>' +
+          '<td>$' + item.price.toFixed(2) + '</td>' +
+          // BUG-016: no min constraint on quantity input
+          '<td><input type="number" value="' + item.qty + '" style="width:60px;padding:4px;" onchange="updateQty(' + i + ', this.value)"></td>' + // BUG-016
+          '<td>$' + subtotal.toFixed(2) + '</td>' +
+          '<td><button class="remove-btn" onclick="removeItem(' + i + ')">Remove</button></td>';
+        tbody.appendChild(tr);
+      }
+      // BUG-012: add extra copy of last item price
+      if (cart.length > 0) {
+        total += cart[cart.length - 1].price; // BUG-012
+      }
+      document.getElementById('cartTotal').textContent = 'Total: $' + total.toFixed(2);
     }
 
     function updateQty(index, val) {
-        // BUG-016: no min=1 check
-        cart[index].qty = parseInt(val) || 0;
-        renderCart();
+      // BUG-016: no min=1 check
+      cart[index].qty = parseInt(val) || 0;
+      renderCart();
     }
 
     // BUG-013: removes item from array but doesn't re-render totals properly
     function removeItem(index) {
-        cart.splice(index, 1);
-        // BUG-013: only update display count, don't call renderCart to fix subtotal
-        var tbody = document.getElementById('cartBody');
-        tbody.deleteRow(index);
-        // Subtotal is NOT recalculated — BUG-013
+      cart.splice(index, 1);
+      // BUG-013: only update display count, don't call renderCart to fix subtotal
+      var tbody = document.getElementById('cartBody');
+      tbody.deleteRow(index);
+      // Subtotal is NOT recalculated — BUG-013
     }
 
     // BUG-034: promo code shows success but doesn't apply discount
     function applyPromo() {
-        var code = document.getElementById('promoInput').value.trim();
-        if (code === 'SAVE10') {
-            document.getElementById('promoMsg').style.display = 'block'; // BUG-034: shows message only
-            // Total is NOT reduced
-        } else {
-            alert('Invalid promo code.');
-        }
+      var code = document.getElementById('promoInput').value.trim();
+      if (code === 'SAVE10') {
+        document.getElementById('promoMsg').style.display = 'block'; // BUG-034: shows message only
+        // Total is NOT reduced
+      } else {
+        alert('Invalid promo code.');
+      }
     }
 
     // ===== SORT (BUG-020) =====
     function sortProducts() {
-        // BUG-020: does nothing
-        return;
+      // BUG-020: does nothing
+      return;
     }
 
     // ===== CATEGORY FILTER =====
     // BUG-035: clicking Skincare highlights Makeup
     function filterCategory(cat) {
-        var links = document.querySelectorAll('.main-nav a');
-        links.forEach(function(l) { l.classList.remove('active'); });
-        // BUG-035: always highlight Makeup (index 1) instead of the clicked link
-        if (cat === 'Skincare') {
-            links[1].classList.add('active'); // BUG-035: highlights Makeup
-        } else {
-            links.forEach(function(l) {
-                if (l.textContent === cat) l.classList.add('active');
-            });
-        }
+      var links = document.querySelectorAll('.main-nav a');
+      links.forEach(function (l) { l.classList.remove('active'); });
+      // BUG-035: always highlight Makeup (index 1) instead of the clicked link
+      if (cat === 'Skincare') {
+        links[1].classList.add('active'); // BUG-035: highlights Makeup
+      } else {
+        links.forEach(function (l) {
+          if (l.textContent === cat) l.classList.add('active');
+        });
+      }
     }
 
     // ===== SHOW MORE (BUG-033) =====
     function toggleMore() {
-        var el = document.getElementById('hiddenProducts');
-        if (el.style.display === 'none' || el.style.display === '') {
-            el.style.display = 'block';
-        } else {
-            el.style.display = 'none';
-        }
-        // BUG-033: button label never changes
+      var el = document.getElementById('hiddenProducts');
+      if (el.style.display === 'none' || el.style.display === '') {
+        el.style.display = 'block';
+      } else {
+        el.style.display = 'none';
+      }
+      // BUG-033: button label never changes
     }
 
     // BUG-007: subscribe button — no event listener attached at all
     // (intentionally NOT adding addEventListener to subscribeBtn)
-</script>
+
+    // ===== NEW FEATURES LOGIC =====
+
+    // 1. WISHLIST (Working)
+    var wishlistItems = [];
+    function toggleWishlist(btn, name) {
+      btn.classList.toggle('active');
+      if (btn.classList.contains('active')) {
+        btn.innerHTML = '&#9829;';
+        wishlistItems.push(name);
+      } else {
+        btn.innerHTML = '&#9825;';
+        wishlistItems = wishlistItems.filter(i => i !== name);
+      }
+      document.getElementById('wishlistCount').textContent = wishlistItems.length;
+    }
+
+    // 2. QUICK VIEW (Working)
+    function openQuickView(card) {
+      const name = card.getAttribute('data-name');
+      const price = card.getAttribute('data-price');
+      const img = card.getAttribute('data-img');
+      document.getElementById('qvName').textContent = name;
+      document.getElementById('qvPrice').textContent = '$' + price;
+      document.getElementById('qvImage').src = img;
+      document.getElementById('quickViewModal').classList.add('open');
+      trackRecentlyViewed(name, img);
+    }
+    function closeQuickView() {
+      document.getElementById('quickViewModal').classList.remove('open');
+    }
+
+    // 3. BACK TO TOP (Working)
+    window.addEventListener('scroll', function () {
+      const btn = document.getElementById('backToTop');
+      if (window.pageYOffset > 300) btn.classList.add('visible');
+      else btn.classList.remove('visible');
+    });
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 4. DARK MODE (Working)
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    // 5. STAR RATINGS (Working)
+    function setRating(star, val) {
+      const container = star.parentElement;
+      container.setAttribute('data-rating', val);
+      const stars = container.querySelectorAll('span');
+      stars.forEach((s, idx) => {
+        if (idx < val) s.classList.add('filled');
+        else s.classList.remove('filled');
+      });
+    }
+
+    // 6. CONTACT FORM (BUG-039)
+    function handleContact(e) {
+      e.preventDefault();
+      // BUG-039: Accepts clearly invalid email because type is text and no JS check
+      alert('Thank you! Your message has been sent.');
+      e.target.reset();
+    }
+
+    // 7. IMAGE ZOOM (BUG-040)
+    function showZoom(el) {
+      const zoom = document.getElementById('zoomPreview');
+      zoom.style.display = 'block';
+      // BUG-040: zoomed image is hardcoded to product 1 in HTML
+    }
+    function hideZoom() {
+      document.getElementById('zoomPreview').style.display = 'none';
+    }
+
+    // 8. RECENTLY VIEWED (BUG-041)
+    var recentlyViewed = [];
+    function trackRecentlyViewed(name, img) {
+      const exists = recentlyViewed.find(i => i.name === name);
+      if (!exists) {
+        // BUG-041: Should be newest-first, but we just push and don't reverse/unshift
+        recentlyViewed.push({ name: name, img: img });
+        if (recentlyViewed.length > 3) recentlyViewed.shift();
+        renderRecentlyViewed();
+      }
+    }
+    function renderRecentlyViewed() {
+      const section = document.getElementById('sectionRecentlyViewed');
+      const grid = document.getElementById('rvGrid');
+      section.style.display = 'block';
+      grid.innerHTML = '';
+      recentlyViewed.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'rv-card';
+        div.innerHTML = '<img src="' + item.img + '"><div class="rv-name">' + item.name + '</div>';
+        grid.appendChild(div);
+      });
+    }
+
+    // 9. COUNTDOWN TIMER (BUG-042)
+    var totalSeconds = 0;
+    setInterval(function () {
+      // BUG-042: Timer counts UP instead of down
+      totalSeconds++;
+      let h = Math.floor(totalSeconds / 3600);
+      let m = Math.floor((totalSeconds % 3600) / 60);
+      let s = totalSeconds % 60;
+      document.getElementById('hours').textContent = String(h).padStart(2, '0');
+      document.getElementById('mins').textContent = String(m).padStart(2, '0');
+      document.getElementById('secs').textContent = String(s).padStart(2, '0');
+    }, 1000);
+
+    // 10. TOAST NOTIFICATIONS (BUG-043)
+    function showToast(name) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      // BUG-043: Toast always shows Skinsheen Bronzer Stick
+      toast.textContent = 'Added "Skinsheen Bronzer Stick" to cart!';
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Wrap existing addToCart to include toast
+    const originalAddToCart = addToCart;
+    addToCart = function (name, price) {
+      originalAddToCart(name, price);
+      showToast(name);
+    };
+  </script>
+
+  <!-- ===== NEW FEATURE OVERLAYS ===== -->
+  <!-- Quick View Modal -->
+  <div class="quickview-overlay" id="quickViewModal">
+    <div class="quickview-modal">
+      <button class="close-btn" onclick="closeQuickView()">&#10005;</button>
+      <img id="qvImage" src="" alt="">
+      <h3 id="qvName">Product Name</h3>
+      <div class="qv-price" id="qvPrice">$0.00</div>
+      <div class="qv-desc" id="qvDesc">Experience the premium quality and lasting effects of this carefully selected
+        beauty essential. Perfect for daily use and all skin types.</div>
+      <button class="btn-show-more" onclick="addToCart(document.getElementById('qvName').textContent, 0)">Add to
+        Cart</button>
+    </div>
+  </div>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="backToTop" onclick="scrollToTop()">&#8593;</button>
+
+  <!-- Image Zoom Preview (BUG-040) -->
+  <div class="zoom-preview" id="zoomPreview">
+    <!-- BUG-040: zoomed image always shows the first product -->
+    <img id="zoomImg" src="https://placehold.co/400x400/fce4ec/e94560?text=Bronzer+Stick" alt="">
+  </div>
+
+  <!-- Toast Notification Container (BUG-043) -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== BUG COUNT BADGE ===== -->
+  <div class="bug-badge">&#128027; Bug Count: 43</div>
 
 </body>
+
 </html>
